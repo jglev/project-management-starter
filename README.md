@@ -79,6 +79,7 @@ This approach provides a dashboard, written in R:
    1. In RStudio, click `File -> Open Project...`.
    1. Navigate to and select `dashboard.Rproj`.
 1. In RStudio, open [`dashboard/dashboard.Rmd`](dashboard/dashboard.Rmd), with `File -> Open File...`
+1. In the RStudio R console, run `renv::restore()` to install extensions that the Dashboard needs.
 1. Click the "`Knit`" button, or click `File -> Knit Document`.
 
 ### OpenProject
