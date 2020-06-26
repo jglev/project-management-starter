@@ -71,7 +71,7 @@ for (line in raw_text) {
   }
     
   description <- gsub(
-    paste0(status_marker_regex, "? (.*?)((\\s*|$)(SCHEDULED|DEADLINE)).*"),
+    paste0(status_marker_regex, "? (.*?)(\\s*(SCHEDULED|DEADLINE).*|$)"),
     "\\2", 
     line, 
     perl = TRUE
@@ -197,9 +197,7 @@ datatable(
 )
 ```
 
-
 ### Deadline in the next week, and Overdue
-
 
 ```{r}
 datatable(
@@ -207,6 +205,28 @@ datatable(
     filter(
       start_represents_deadline == TRUE &
       ymd(start) <= (Sys.Date() + 7) & 
+      group != "DONE"
+    ) %>% 
+    select(-style, -start_represents_deadline) %>% 
+    rename(
+      Status = group,
+      Description = content,
+      Scheduled = start,
+      Deadline = end
+    ),
+  options = list(pageLength = 5)
+)
+```
+
+### Non-scheduled tasks
+
+
+```{r}
+datatable(
+  parsed_data %>% 
+    filter(
+      is.na(start) &
+      is.na(end) &
       group != "DONE"
     ) %>% 
     select(-style, -start_represents_deadline) %>% 
