@@ -80,6 +80,7 @@ This approach provides a dashboard, written in R:
    1. Navigate to and select `dashboard.Rproj`.
 1. In RStudio, open [`dashboard/dashboard.Rmd`](dashboard/dashboard.Rmd), with `File -> Open File...`
 1. _(Only necesssary the first time you run the Dashboard)_ In the RStudio R console, run `renv::restore()` to install extensions that the Dashboard needs.
+      - If you are on MacOS and see an error, "`ld: library not found for -lgfortran`", you may need click `Tools -> Terminal -> New Terminal...`, and run `xcode-select --install` to install [XCode](https://developer.apple.com/xcode/ide/) on your system. (This is to be tried after following any directions in the error message.)
 1. Click the "`Knit`" button, or click `File -> Knit Document`.
 
 ### OpenProject
