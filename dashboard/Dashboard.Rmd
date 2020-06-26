@@ -176,7 +176,7 @@ ggplot(parsed_data, aes(
    )
 ```
 
-### Scheduled to start before two weeks from now
+### Scheduled to start two weeks from now or earlier
 
 ```{r}
 datatable(
