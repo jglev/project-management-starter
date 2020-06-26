@@ -64,3 +64,8 @@
 1. Run `start.sh`
 1. Wait a few minutes, then go to http://localhost:8080/ in your web browser.
 1. Sign in with username `admin` and password `admin`. You will be asked to create a new password.
+
+## Additional reference material
+
+- [Introduction to **Markdown**](https://guides.github.com/features/mastering-markdown/)
+- [`org-checkbox` VSCode extension key](key.md)
