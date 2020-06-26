@@ -101,4 +101,4 @@ This approach uses [OpenProject](https://www.openproject.org/), which is open-so
 ### Additional reference material
 
 - [Introduction to **Markdown**](https://guides.github.com/features/mastering-markdown/)
-- [`org-checkbox` VSCode extension key](key.md)
+- [`org-checkbox` VSCode extension key](https://raw.githubusercontent.com/publicus/project-management-starter/master/key.md)
