@@ -1,0 +1,11 @@
+version: "3.3"
+services:
+  openproject:
+    container_name: openproject
+    image: openproject/community:10
+    ports:
+      - 8080:80
+    volumes:
+      - ./docker-mountpoints/static:/var/db/openproject
+      - ./docker-mountpoints/logs:/var/log/supervisor
+      - ./docker-mountpoints/pgdata:/var/lib/postgresql/9.6/main

@@ -1,0 +1,184 @@
+---
+title: "Dissertation Dashboard"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+---
+
+```{r setup, include=FALSE}
+library(dplyr)
+library(DT)
+library(flexdashboard)
+library(ggplot2)
+library(lubridate)
+library(timevis)
+```
+
+```{r parse data, include=FALSE}
+raw_text <- readLines(file.path("..", "ProjectNotes.md"))
+
+# Create a blank dataframe, which we'll fill in below:
+parsed_data <- data.frame(
+  group=character(),
+  content=character(), 
+  start=character(), 
+  end=character(),
+  stringsAsFactors=FALSE
+)
+
+# Loop though the todo file's lines, and find and parse the todo lines within it:
+for (line in raw_text) {
+  line_data <- data.frame(
+    group=character(),
+    content=character(), 
+    start=character(), 
+    end=character(),
+    stringsAsFactors=FALSE
+  )
+  
+  status_marker_regex <- "\\s*- \\[(.)\\].*"
+  status_marker <- gsub(status_marker_regex, "\\1", line, perl = TRUE)
+  
+  # If no match was found above, status_marker will be the same as line. In that case, we
+  # can consider this not to be a todo line:
+  if (status_marker == line) {
+    next 
+  }
+  
+  if (status_marker == " ") {
+    line_data[1, "group"] <- "TODO" 
+  } else if (status_marker == "/") {
+    line_data[1, "group"] <- "RIGHT NOW" 
+  } else if (status_marker == "x" || status_marker == "X") {
+    line_data[1, "group"] <- "DONE" 
+  } else if (status_marker == "V" || status_marker == "v") {
+    line_data[1, "group"] <- "DONE" 
+  } else if (status_marker == ">") {
+    line_data[1, "group"] <- "SCHEDULED" 
+  } else if (status_marker == "<") {
+    line_data[1, "group"] <- "MIGRATED" 
+  } else if (status_marker == "-") {
+    line_data[1, "group"] <- "CANCELLED" 
+  } else if (status_marker == "O") {
+    line_data[1, "group"] <- "BLOCKED" 
+  }
+    
+  description <- gsub(
+    paste0(status_marker_regex, "? (.*?)((\\s*|$)(SCHEDULED|DUE)).*"),
+    "\\2", 
+    line, 
+    perl = TRUE
+  )
+  
+  if (description != line) {
+    line_data[1, "content"] <- description
+  }
+  
+  scheduled <- gsub(".* SCHEDULED: (.*?)(\\s|$).*", "\\1", line, perl = TRUE)
+  if (scheduled != line) {
+    line_data[1, "start"] <- scheduled
+  }
+  
+  due <- gsub(".* DUE: (.*?)(\\s|$).*", "\\1", line, perl = TRUE)
+  if (due != line) {
+    line_data[1, "end"] <- due
+  }
+  
+  if (!is.na(line_data[1, "start"]) || !is.na(line_data[1, "end"])) {
+    parsed_data <- rbind(parsed_data, line_data)
+  }
+}
+```
+
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+### Gantt Chart
+
+```{r}
+parsed_data %>% 
+  filter(!is.na(start)) %>% 
+  timevis(
+    groups = data.frame(
+      id = c(
+        "TODO",
+        "RIGHT NOW",
+        "DONE",
+        "SCHEDULED",
+        "MIGRATED",
+        "CANCELLED",
+        "BLOCKED"
+      ),
+      content = c(
+        "TODO",
+        "RIGHT NOW",
+        "DONE",
+        "SCHEDULED",
+        "MIGRATED",
+        "CANCELLED",
+        "BLOCKED"
+      ),
+      style = c(
+        "color: #FF0000", 
+        "color: #0000FF",
+        "color: #90EE90",
+        "color: #0000FF",
+        "color: #9370D8",
+        "color: #82d882",
+        "color: #FFA500"
+      )
+    )
+  )
+```
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+### Status Breakdown
+
+```{r}
+ggplot(parsed_data, aes(group, fill = factor(group))) + 
+  geom_bar() + 
+  theme_classic() +
+  scale_fill_manual(values = c(
+    "TODO" = "#FF0000", 
+    "RIGHT NOW" = "#0000FF",
+    "DONE" = "#90EE90",
+    "SCHEDULED" = "#0000FF",
+    "MIGRATED" = "#9370D8",
+    "CANCELLED" = "#82d882",
+    "BLOCKED" = "#FFA500"
+  )) + 
+   theme(
+     legend.position = "none"
+   )
+```
+
+### Scheduled Tasks
+
+```{r}
+datatable(
+  parsed_data %>% 
+    filter(
+      ymd(start) <= Sys.Date() & 
+      group != "DONE"
+    ),
+  options = list(pageLength = 5)
+)
+```
+
+
+### Due and Overdue Tasks
+
+
+```{r}
+datatable(
+  parsed_data %>% 
+    filter(
+      ymd(end) >= Sys.Date() & 
+      group != "DONE"
+    ),
+  options = list(pageLength = 5)
+)
+```
