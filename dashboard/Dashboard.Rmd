@@ -24,16 +24,20 @@ parsed_data <- data.frame(
   content=character(), 
   start=character(), 
   end=character(),
+  style=character(),
   stringsAsFactors=FALSE
 )
 
 # Loop though the todo file's lines, and find and parse the todo lines within it:
+# See the ?timevis documentation to understand the column names and
+# values that are used below:
 for (line in raw_text) {
   line_data <- data.frame(
     group=character(),
     content=character(), 
     start=character(), 
     end=character(),
+    style=character(),
     stringsAsFactors=FALSE
   )
   
@@ -85,6 +89,21 @@ for (line in raw_text) {
     line_data[1, "end"] <- due
   }
   
+  if (!is.na(line_data[1, "start"]) && is.na(line_data[1, "end"])) {
+    line_data[1, "style"] <- "color: black; background: white; border-bottom: .5em solid darkturquoise"
+  } else if (is.na(line_data[1, "start"]) && !is.na(line_data[1, "end"])) {
+    # timevis requires every charted line to have a 'start' value. In this
+    # case, we will call the Due date the "start", but will mark it with a different
+    # color:
+    line_data[1, "start"] <- line_data[1, "end"]
+    line_data[1, "end"] <- NA
+    line_data[1, "style"] <- "color: black; background: white; border-bottom: .5em solid deeppink"
+  } else {
+    # If both start and end are set:
+    line_data[1, "style"] <- "color: black; background: white; border: .5em solid;
+  border-image-source: linear-gradient(to right, darkturquoise, deeppink); border-image-slice: 1; border-top:0; border-left:0; border-right:0;"
+  }
+  
   if (!is.na(line_data[1, "start"]) || !is.na(line_data[1, "end"])) {
     parsed_data <- rbind(parsed_data, line_data)
   }
@@ -98,7 +117,9 @@ Column {data-width=650}
 
 ```{r}
 parsed_data %>% 
-  filter(!is.na(start)) %>% 
+  filter(
+    !is.na(start)
+  ) %>% 
   timevis(
     groups = tribble(
       ~id,          ~content,     ~style,
