@@ -16,7 +16,16 @@ library(timevis)
 ```
 
 ```{r parse data, include=FALSE}
-raw_text <- readLines(file.path("..", "ProjectNotes.md"))
+primary_file <- file.path("..", "Project_Notes.md")
+secondary_file <- file.path("..", "Project_Notes_Example.md")
+
+if (file.exists(primary_file)) {
+  file_to_use <- primary_file
+} else {
+  file_to_use <- secondary_file
+}
+
+raw_text <- readLines(file_to_use)
 
 # Create a blank dataframe, which we'll fill in below:
 parsed_data <- data.frame(
