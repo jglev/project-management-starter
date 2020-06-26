@@ -4,12 +4,12 @@
 
 ### Setup
 
-1. Install [Visual Studio Code](https://code.visualstudio.com/) ("VSCode")
+1. Install [Visual Studio Code](https://code.visualstudio.com/) ("VSCode") for your Operating System.
 1. Install the "`org-checkbox`" extension:
    1. Open VSCode.
    1. In VSCode, type `Cmd/Ctrl + Shift + P`, then "`Extensions: Install Extensions`", and press Enter.
    1. In the Extensions sidebar that pops up, type "`org-checkbox`". You should see one by `publicus`. Click "Install".
-1. Install [RStudio](https://rstudio.com/products/rstudio/download/)
+1. Install [RStudio](https://rstudio.com/products/rstudio/download/) for your Operating System.
 
 ### Open this directory in VSCode
 
