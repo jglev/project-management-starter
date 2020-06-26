@@ -19,7 +19,19 @@
 
 ### Visual Studio Code + RStudio
 
+This approach provides a dashboard, written in R:
+
+![example_screenshots/statuses.png](example_screenshots/statuses.png)
+
+![example_screenshots/scheduled.png](example_screenshots/scheduled.png)
+
 #### Setup
+
+1. Download these files:
+   1. Click `Clone -> Download ZIP`.
+      ![example_screenshots/github_clone.png](example_screenshots/github_clone.png)
+   1. Un-zip the downloaded archive.
+1. Create a copy of `Project_Notes_Example.md`, and call it `Project_Notes.md`. **This will be the file you use as your global Todo list.**
 
 1. Install [Visual Studio Code](https://code.visualstudio.com/) ("VSCode") for your Operating System.
 1. Install the "`org-checkbox`" extension:
@@ -70,6 +82,10 @@
 1. Click the "`Knit`" button, or click `File -> Knit Document`.
 
 ### OpenProject
+
+This approach uses [OpenProject](https://www.openproject.org/), which is open-source Project Management software for ["Agile" Project Management](https://www.atlassian.com/agile/project-management/epics-stories-themes).
+
+![example_screenshots/openproject.png](example_screenshots/openproject.png)
 
 #### Setup
 
