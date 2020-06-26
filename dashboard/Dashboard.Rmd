@@ -3,7 +3,7 @@ title: "Dissertation Dashboard"
 output: 
   flexdashboard::flex_dashboard:
     orientation: columns
-    vertical_layout: fill
+    vertical_layout: scroll
 ---
 
 ```{r setup, include=FALSE}
@@ -119,6 +119,8 @@ Column {data-width=650}
 
 ### Gantt Chart
 
+_Note: _ Only tasks that have `SCHEDULED` and / or `DEADLINE` elements are listed here.
+
 ```{r}
 parsed_data %>% 
   filter(
@@ -138,10 +140,10 @@ parsed_data %>%
   )
 ```
 
-Column {data-width=350}
+Column {data-width=350 .tabset .tabset-fade}
 -----------------------------------------------------------------------
 
-### Status Breakdown
+### Statuses
 
 ```{r}
 ggplot(parsed_data, aes(
@@ -176,7 +178,11 @@ ggplot(parsed_data, aes(
    )
 ```
 
-### Scheduled to start two weeks from now or earlier
+### Scheduled
+
+#### Scheduled to start two weeks from now or earlier
+
+<br />
 
 ```{r}
 datatable(
@@ -197,7 +203,11 @@ datatable(
 )
 ```
 
-### Deadline in the next week, and Overdue
+### Deadlines
+
+#### Deadline in the next week, and Overdue
+
+<br />
 
 ```{r}
 datatable(
@@ -218,8 +228,11 @@ datatable(
 )
 ```
 
-### Non-scheduled tasks
+### Other
 
+#### Non-scheduled tasks
+
+<br />
 
 ```{r}
 datatable(
