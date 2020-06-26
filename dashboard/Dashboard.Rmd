@@ -171,7 +171,8 @@ ggplot(parsed_data, aes(
   )) + 
    theme(
      legend.position = "none",
-     text = element_text(size=20)
+     text = element_text(size=20),
+     axis.text.x = element_text(angle = 30, vjust = 0.5)
    )
 ```
 
