@@ -12,7 +12,6 @@ library(DT)
 library(flexdashboard)
 library(ggplot2)
 library(lubridate)
-library(scale)
 library(timevis)
 ```
 
@@ -120,18 +119,30 @@ Column {data-width=350}
 ### Status Breakdown
 
 ```{r}
-ggplot(parsed_data, aes(group, fill = factor(group))) + 
+ggplot(parsed_data, aes(
+  factor(group, levels = c(
+    "TODO",
+    "RIGHT NOW",
+    "SCHEDULED",
+    "MIGRATED",
+    "CANCELLED",
+    "BLOCKED",
+    "DONE"
+  )), 
+  fill = factor(group)
+)) + 
+  xlab("Status") + 
+  ylab("Count") +
   geom_bar() + 
-  scale_y_continuous(breaks= pretty_breaks()) +
   theme_classic() +
   scale_fill_manual(values = c(
     "TODO" = "#FF0000", 
     "RIGHT NOW" = "#0000FF",
-    "DONE" = "#90EE90",
     "SCHEDULED" = "#0000FF",
     "MIGRATED" = "#9370D8",
     "CANCELLED" = "#82d882",
-    "BLOCKED" = "#FFA500"
+    "BLOCKED" = "#FFA500",
+    "DONE" = "#90EE90"
   )) + 
    theme(
      legend.position = "none",
@@ -147,6 +158,12 @@ datatable(
     filter(
       ymd(start) <= Sys.Date() & 
       group != "DONE"
+    ) %>% 
+    rename(
+      Status = group,
+      Description = content,
+      Scheduled = start,
+      Due = end
     ),
   options = list(pageLength = 5)
 )
@@ -162,6 +179,12 @@ datatable(
     filter(
       ymd(end) >= Sys.Date() & 
       group != "DONE"
+    ) %>% 
+    rename(
+      Status = group,
+      Description = content,
+      Scheduled = start,
+      Due = end
     ),
   options = list(pageLength = 5)
 )
