@@ -7,3 +7,4 @@
       More notes.
   - [/] Item 3 SCHEDULED: 2020-02-03
     - [x] Item 4 SCHEDULED: 2020-04-05 DUE: 2020-05-05
+- [ ] Item 5, a particularly long line, with a large amount of content. SCHEDULED: 2020-06-30

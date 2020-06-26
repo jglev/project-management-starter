@@ -25,6 +25,7 @@ parsed_data <- data.frame(
   start=character(), 
   end=character(),
   style=character(),
+  start_represents_due=logical(),
   stringsAsFactors=FALSE
 )
 
@@ -38,6 +39,7 @@ for (line in raw_text) {
     start=character(), 
     end=character(),
     style=character(),
+    start_represents_due=logical(),
     stringsAsFactors=FALSE
   )
   
@@ -102,14 +104,13 @@ for (line in raw_text) {
     line_data[1, "start"] <- line_data[1, "end"]
     line_data[1, "end"] <- NA
     line_data[1, "style"] <- paste0("color: black; background: white; border-bottom: .5em solid ", due_color)
+    line_data[1, "start_represents_due"] <- TRUE
   } else {
     # If both start and end are set:
     line_data[1, "style"] <- paste0("color: black; background: white; border-image-source: linear-gradient(to right, ", scheduled_color,", ", due_color, "); border-image-slice: 1; border-bottom: .5em solid; border-top: 1px solid; border-left: 1px solid; border-right: 1px solid;")
   }
   
-  if (!is.na(line_data[1, "start"]) || !is.na(line_data[1, "end"])) {
-    parsed_data <- rbind(parsed_data, line_data)
-  }
+  parsed_data <- rbind(parsed_data, line_data)
 }
 ```
 
@@ -174,15 +175,17 @@ ggplot(parsed_data, aes(
    )
 ```
 
-### Scheduled Tasks
+### Scheduled to start before two weeks from now
 
 ```{r}
 datatable(
   parsed_data %>% 
     filter(
-      ymd(start) <= Sys.Date() & 
+      # + 14 adds 14 days
+      ymd(start) <= (Sys.Date() + 14) & 
       group != "DONE"
     ) %>% 
+    select(-style, -start_represents_due) %>% 
     rename(
       Status = group,
       Description = content,
@@ -194,16 +197,18 @@ datatable(
 ```
 
 
-### Due and Overdue Tasks
+### Due in the next week, and Overdue
 
 
 ```{r}
 datatable(
   parsed_data %>% 
     filter(
-      ymd(end) >= Sys.Date() & 
+      start_represents_due == TRUE &
+      ymd(start) <= (Sys.Date() + 7) & 
       group != "DONE"
     ) %>% 
+    select(-style, -start_represents_due) %>% 
     rename(
       Status = group,
       Description = content,
