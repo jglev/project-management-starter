@@ -12,6 +12,7 @@ library(DT)
 library(flexdashboard)
 library(ggplot2)
 library(lubridate)
+library(scale)
 library(timevis)
 ```
 
@@ -100,34 +101,15 @@ Column {data-width=650}
 parsed_data %>% 
   filter(!is.na(start)) %>% 
   timevis(
-    groups = data.frame(
-      id = c(
-        "TODO",
-        "RIGHT NOW",
-        "DONE",
-        "SCHEDULED",
-        "MIGRATED",
-        "CANCELLED",
-        "BLOCKED"
-      ),
-      content = c(
-        "TODO",
-        "RIGHT NOW",
-        "DONE",
-        "SCHEDULED",
-        "MIGRATED",
-        "CANCELLED",
-        "BLOCKED"
-      ),
-      style = c(
-        "color: #FF0000", 
-        "color: #0000FF",
-        "color: #90EE90",
-        "color: #0000FF",
-        "color: #9370D8",
-        "color: #82d882",
-        "color: #FFA500"
-      )
+    groups = tribble(
+      ~id,          ~content,     ~style,
+      "TODO",       "TODO",       "color: #FF0000", 
+      "RIGHT NOW",  "RIGHT NOW",  "color: #0000FF",
+      "SCHEDULED",  "SCHEDULED",  "color: #0000FF",
+      "MIGRATED",   "MIGRATED",   "color: #9370D8",
+      "BLOCKED",    "BLOCKED",    "color: #FFA500",
+      "CANCELLED",  "CANCELLED",  "color: #82d882",
+      "DONE",       "DONE",       "color: #90EE90",
     )
   )
 ```
@@ -140,6 +122,7 @@ Column {data-width=350}
 ```{r}
 ggplot(parsed_data, aes(group, fill = factor(group))) + 
   geom_bar() + 
+  scale_y_continuous(breaks= pretty_breaks()) +
   theme_classic() +
   scale_fill_manual(values = c(
     "TODO" = "#FF0000", 
@@ -151,7 +134,8 @@ ggplot(parsed_data, aes(group, fill = factor(group))) +
     "BLOCKED" = "#FFA500"
   )) + 
    theme(
-     legend.position = "none"
+     legend.position = "none",
+     text = element_text(size=20)
    )
 ```
 
