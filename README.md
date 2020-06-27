@@ -19,7 +19,9 @@
 
 ### Visual Studio Code + RStudio
 
-This approach provides a dashboard, written in R:
+The primary approach suggested by these materials is to use a text editor, [Visual Studio Code](https://code.visualstudio.com/), and a data analysis program like [R/RStudio](https://rstudio.com/products/rstudio/download/), to manage projects that are being worked on by one person.
+
+The code in this repository provides a dashboard, written in R:
 
 ![documentation/example_screenshots/statuses.png](documentation/example_screenshots/statuses.png)
 
@@ -80,12 +82,12 @@ This approach provides a dashboard, written in R:
    1. Navigate to and select `dashboard.Rproj`.
 1. In RStudio, open [`dashboard/dashboard.Rmd`](dashboard/dashboard.Rmd), with `File -> Open File...`
 1. _(Only necesssary the first time you run the Dashboard)_ In the RStudio R console, run `renv::restore()` to install extensions that the Dashboard needs.
-      - If you are on MacOS and see an error, "`ld: library not found for -lgfortran`", you may need click `Tools -> Terminal -> New Terminal...`, and run `xcode-select --install` to install [XCode](https://developer.apple.com/xcode/ide/) on your system. (This is to be tried after following any directions in the error message.)
+   - If you are on MacOS and see an error, "`ld: library not found for -lgfortran`", you may need click `Tools -> Terminal -> New Terminal...`, and run `xcode-select --install` to install [XCode](https://developer.apple.com/xcode/ide/) on your system. (This is to be tried after following any directions in the error message.)
 1. Click the "`Knit`" button, or click `File -> Knit Document`.
 
 ### OpenProject
 
-This approach uses [OpenProject](https://www.openproject.org/), which is open-source Project Management software for ["Agile" Project Management](https://www.atlassian.com/agile/project-management/epics-stories-themes).
+A second approach is to use [OpenProject](https://www.openproject.org/), which is open-source Project Management software for ["Agile" Project Management](https://www.atlassian.com/agile/project-management/epics-stories-themes).
 
 ![documentation/example_screenshots/openproject.png](documentation/example_screenshots/openproject.png)
 

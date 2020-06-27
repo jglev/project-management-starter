@@ -20,3 +20,4 @@
   - "`DEADLINE:`" means that "the task... is supposed to be finished on that date."
   - "`SCHEDULED:`" means that "you are planning to start working on that task on the given date."
 - Dates are written in `YYYY-MM-DD` format (e.g., `2020-06-26`). This provides consistency. In addition, it allows sorting items (or files, if they are named by date) chronologically -- items sorted alphabetically will be chronological, using this naming convention.
+- Because these notes are all just text, there's no worry about being able to migrate them to a different system in the future.
