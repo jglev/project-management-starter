@@ -4,6 +4,7 @@ output:
   flexdashboard::flex_dashboard:
     orientation: columns
     vertical_layout: scroll
+    runtime: shiny
 ---
 
 ```{r setup, include=FALSE}
@@ -15,17 +16,26 @@ library(lubridate)
 library(timevis)
 ```
 
+```{r select file}
+files <- list.files(
+  path = "..", 
+  pattern = ".*\\.(md|mkd|markdown|R[Mm]arkdown|Rmd|rmd)", 
+  all.files = FALSE,
+  full.names = TRUE, 
+  recursive = FALSE,
+  no.. = TRUE
+)
+
+selectInput(
+  "selected_files",
+  label = "Notes File(s)",
+  multiple = TRUE,
+  choices = files, 
+  selected = files[1]
+)
+```
+
 ```{r parse data, include=FALSE}
-primary_file <- file.path("..", "Project_Notes.md")
-secondary_file <- file.path("..", "Project_Notes_Example.md")
-
-if (file.exists(primary_file)) {
-  file_to_use <- primary_file
-} else {
-  file_to_use <- secondary_file
-}
-
-raw_text <- readLines(file_to_use)
 
 # Create a blank dataframe, which we'll fill in below:
 parsed_data <- data.frame(
@@ -38,88 +48,92 @@ parsed_data <- data.frame(
   stringsAsFactors=FALSE
 )
 
-# Loop though the todo file's lines, and find and parse the todo lines within it:
-# See the ?timevis documentation to understand the column names and
-# values that are used below:
-for (line in raw_text) {
-  line_data <- data.frame(
-    group=character(),
-    content=character(), 
-    start=character(), 
-    end=character(),
-    style=character(),
-    start_represents_deadline=logical(),
-    stringsAsFactors=FALSE
-  )
+for (file_to_use in input$selected_files) {
+  raw_text <- readLines(file_to_use)
   
-  status_marker_regex <- "\\s*- \\[(.)\\].*"
-  status_marker <- gsub(status_marker_regex, "\\1", line, perl = TRUE)
-  
-  # If no match was found above, status_marker will be the same as line. In that case, we
-  # can consider this not to be a todo line:
-  if (status_marker == line) {
-    next 
-  }
-  
-  if (status_marker == " ") {
-    line_data[1, "group"] <- "TODO" 
-  } else if (status_marker == "/") {
-    line_data[1, "group"] <- "RIGHT NOW" 
-  } else if (status_marker == "x" || status_marker == "X") {
-    line_data[1, "group"] <- "DONE" 
-  } else if (status_marker == "V" || status_marker == "v") {
-    line_data[1, "group"] <- "DONE" 
-  } else if (status_marker == ">") {
-    line_data[1, "group"] <- "SCHEDULED" 
-  } else if (status_marker == "<") {
-    line_data[1, "group"] <- "MIGRATED" 
-  } else if (status_marker == "-") {
-    line_data[1, "group"] <- "CANCELLED" 
-  } else if (status_marker == "O") {
-    line_data[1, "group"] <- "BLOCKED" 
-  }
+  # Loop though the todo file's lines, and find and parse the todo lines within it:
+  # See the ?timevis documentation to understand the column names and
+  # values that are used below:
+  for (line in raw_text) {
+    line_data <- data.frame(
+      group=character(),
+      content=character(), 
+      start=character(), 
+      end=character(),
+      style=character(),
+      start_represents_deadline=logical(),
+      stringsAsFactors=FALSE
+    )
     
-  description <- gsub(
-    paste0(status_marker_regex, "? (.*?)(\\s*(SCHEDULED|DEADLINE).*|$)"),
-    "\\2", 
-    line, 
-    perl = TRUE
-  )
-  
-  if (description != line) {
-    line_data[1, "content"] <- description
+    status_marker_regex <- "\\s*- \\[(.)\\].*"
+    status_marker <- gsub(status_marker_regex, "\\1", line, perl = TRUE)
+    
+    # If no match was found above, status_marker will be the same as line. In that case, we
+    # can consider this not to be a todo line:
+    if (status_marker == line) {
+      next 
+    }
+    
+    if (status_marker == " ") {
+      line_data[1, "group"] <- "TODO" 
+    } else if (status_marker == "/") {
+      line_data[1, "group"] <- "RIGHT NOW" 
+    } else if (status_marker == "x" || status_marker == "X") {
+      line_data[1, "group"] <- "DONE" 
+    } else if (status_marker == "V" || status_marker == "v") {
+      line_data[1, "group"] <- "DONE" 
+    } else if (status_marker == ">") {
+      line_data[1, "group"] <- "SCHEDULED" 
+    } else if (status_marker == "<") {
+      line_data[1, "group"] <- "MIGRATED" 
+    } else if (status_marker == "-") {
+      line_data[1, "group"] <- "CANCELLED" 
+    } else if (status_marker == "O") {
+      line_data[1, "group"] <- "BLOCKED" 
+    }
+      
+    description <- gsub(
+      paste0(status_marker_regex, "? (.*?)(\\s*(SCHEDULED|DEADLINE).*|$)"),
+      "\\2", 
+      line, 
+      perl = TRUE
+    )
+    
+    if (description != line) {
+      line_data[1, "content"] <- description
+    }
+    
+    scheduled <- gsub(".* SCHEDULED: (.*?)(\\s|$).*", "\\1", line, perl = TRUE)
+    if (scheduled != line) {
+      line_data[1, "start"] <- scheduled
+    }
+    
+    deadline <- gsub(".* DEADLINE: (.*?)(\\s|$).*", "\\1", line, perl = TRUE)
+    if (deadline != line) {
+      line_data[1, "end"] <- deadline
+    }
+    
+    # These colors are colorblind safe, per https://colorbrewer2.org/#type=diverging&scheme=RdYlBu&n=3:
+    scheduled_color <- "#91bfdb"
+    deadline_color <- "#fc8d59"
+    
+    if (!is.na(line_data[1, "start"]) && is.na(line_data[1, "end"])) {
+      line_data[1, "style"] <- paste0("color: black; background: white; border-bottom: .5em solid ", scheduled_color)
+    } else if (is.na(line_data[1, "start"]) && !is.na(line_data[1, "end"])) {
+      # timevis requires every charted line to have a 'start' value. In this
+      # case, we will call the Deadline date the "start", but will mark it with a different
+      # color:
+      line_data[1, "start"] <- line_data[1, "end"]
+      line_data[1, "end"] <- NA
+      line_data[1, "style"] <- paste0("color: black; background: white; border: 1px solid ", deadline_color, "; border-bottom: .5em solid ", deadline_color, ";")
+      line_data[1, "start_represents_deadline"] <- TRUE
+    } else {
+      # If both start and end are set:
+      line_data[1, "style"] <- paste0("color: black; background: white; border-image-source: linear-gradient(to right, ", scheduled_color,", ", deadline_color, "); border-image-slice: 1; border-bottom: .5em solid; border-top: 1px solid; border-left: 1px solid; border-right: 1px solid;")
+    }
+    
+    parsed_data <- rbind(parsed_data, line_data)
   }
-  
-  scheduled <- gsub(".* SCHEDULED: (.*?)(\\s|$).*", "\\1", line, perl = TRUE)
-  if (scheduled != line) {
-    line_data[1, "start"] <- scheduled
-  }
-  
-  deadline <- gsub(".* DEADLINE: (.*?)(\\s|$).*", "\\1", line, perl = TRUE)
-  if (deadline != line) {
-    line_data[1, "end"] <- deadline
-  }
-  
-  # These colors are colorblind safe, per https://colorbrewer2.org/#type=diverging&scheme=RdYlBu&n=3:
-  scheduled_color <- "#91bfdb"
-  deadline_color <- "#fc8d59"
-  
-  if (!is.na(line_data[1, "start"]) && is.na(line_data[1, "end"])) {
-    line_data[1, "style"] <- paste0("color: black; background: white; border-bottom: .5em solid ", scheduled_color)
-  } else if (is.na(line_data[1, "start"]) && !is.na(line_data[1, "end"])) {
-    # timevis requires every charted line to have a 'start' value. In this
-    # case, we will call the Deadline date the "start", but will mark it with a different
-    # color:
-    line_data[1, "start"] <- line_data[1, "end"]
-    line_data[1, "end"] <- NA
-    line_data[1, "style"] <- paste0("color: black; background: white; border: 1px solid ", deadline_color, "; border-bottom: .5em solid ", deadline_color, ";")
-    line_data[1, "start_represents_deadline"] <- TRUE
-  } else {
-    # If both start and end are set:
-    line_data[1, "style"] <- paste0("color: black; background: white; border-image-source: linear-gradient(to right, ", scheduled_color,", ", deadline_color, "); border-image-slice: 1; border-bottom: .5em solid; border-top: 1px solid; border-left: 1px solid; border-right: 1px solid;")
-  }
-  
-  parsed_data <- rbind(parsed_data, line_data)
 }
 ```
 
