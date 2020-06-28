@@ -78,7 +78,7 @@ dashboardPage(
                 tabName = "visual",
                 fluidRow(
                     box(timevisOutput("gantt_chart"), width = 12),
-                    box(plotOutput("statuses_chart", height = "20vh"), width = 12)
+                    box(plotOutput("statuses_chart", height = "40vh"), width = 12)
                 )
             ),
             tabItem(
