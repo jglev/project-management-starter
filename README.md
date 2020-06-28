@@ -76,14 +76,22 @@ The code in this repository provides a dashboard, written in R:
 
 #### Open the Dashboard in RStudio
 
-1. Open [`dashboard/dashboard.Rproj`](dashboard/dashboard.Rproj) using RStudio:
-   1. Open RStudio
-   1. In RStudio, click `File -> Open Project...`.
-   1. Navigate to and select `dashboard.Rproj`.
-1. In RStudio, open [`dashboard/dashboard.Rmd`](dashboard/dashboard.Rmd), with `File -> Open File...`
-1. _(Only necesssary the first time you run the Dashboard)_ In the RStudio R console, run `renv::restore()` to install extensions that the Dashboard needs.
-   - If you are on MacOS and see an error, "`ld: library not found for -lgfortran`", you may need click `Tools -> Terminal -> New Terminal...`, and run `xcode-select --install` to install [XCode](https://developer.apple.com/xcode/ide/) on your system. (This is to be tried after following any directions in the error message.)
-1. Click the "`Knit`" button, or click `File -> Knit Document`.
+1.  Open [`dashboard/dashboard.Rproj`](dashboard/dashboard.Rproj) using RStudio:
+    1. Open RStudio
+    1. In RStudio, click `File -> Open Project...`.
+    1. Navigate to and select `dashboard.Rproj`.
+1.  In RStudio, open [`dashboard/ui.R`](dashboard/dashboard.Rmd), with `File -> Open File...`
+1.  _(Only necesssary the first time you run the Dashboard)_ In the RStudio R console, run `renv::restore()` to install extensions that the Dashboard needs.
+    - If you are on MacOS and see an error, "`ld: library not found for -lgfortran`", you may need click `Tools -> Terminal -> New Terminal...`, and run `xcode-select --install` to install [XCode](https://developer.apple.com/xcode/ide/) on your system. (This is to be tried after following any directions in the error message.)
+1.  Click the "`Run App`" button.
+
+    - Alternatively, from a Unix shell in this repository's top-level directory, you may run
+
+      ```sh
+      (cd dashboard && R -e "shiny::runApp('.', port = 8088)"
+      ```
+
+      You may then visit your web browser at `http://localhost:8088`.
 
 ### OpenProject
 
