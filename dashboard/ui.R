@@ -56,6 +56,7 @@ dashboardPage(
             icon = icon("trash")
         ),
         hr(),
+        sidebarSearchForm(textId = "content_search", buttonId = "searchbtn", label = "Search descriptions..."),
         checkboxGroupInput(
             "selected_statuses",
             label = "Statuses",

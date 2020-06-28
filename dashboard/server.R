@@ -198,7 +198,8 @@ shinyServer(function(input, output, session) {
         reactive_parsed_data() %>% 
             filter(
                 !is.na(start) &
-                    group %in% input$selected_statuses
+                    group %in% input$selected_statuses &
+                    grepl(input$content_search, content, fixed = TRUE)
             ) %>% 
             timevis(
                 groups = status_color_groups %>% 
@@ -211,7 +212,8 @@ shinyServer(function(input, output, session) {
     output$statuses_chart <- renderPlot({
         ggplot(reactive_parsed_data() %>% 
             filter(
-               group %in% input$selected_statuses
+               group %in% input$selected_statuses &
+               grepl(input$content_search, content, fixed = TRUE)
             ), aes(
             factor(group, levels = c(
                 "DONE",
@@ -251,7 +253,8 @@ shinyServer(function(input, output, session) {
                 filter(
                     # + 14 adds 14 days
                     ymd(start) <= (Sys.Date() + 14) & 
-                        group != "DONE"
+                    group != "DONE" &
+                    grepl(input$content_search, content, fixed = TRUE)
                 ) %>% 
                 select(-style, -start_represents_deadline) %>% 
                 rename(
@@ -279,8 +282,9 @@ shinyServer(function(input, output, session) {
             reactive_parsed_data() %>% 
                 filter(
                     start_represents_deadline == TRUE &
-                        ymd(start) <= (Sys.Date() + 7) & 
-                        group != "DONE"
+                    ymd(start) <= (Sys.Date() + 7) & 
+                    group != "DONE" &
+                    grepl(input$content_search, content, fixed = TRUE)
                 ) %>% 
                 select(-style, -start_represents_deadline) %>% 
                 rename(
@@ -308,8 +312,9 @@ shinyServer(function(input, output, session) {
             reactive_parsed_data() %>% 
                 filter(
                     is.na(start) &
-                        is.na(end) &
-                        group != "DONE"
+                    is.na(end) &
+                    group != "DONE" &
+                    grepl(input$content_search, content, fixed = TRUE)
                 ) %>% 
                 select(-style, -start_represents_deadline) %>% 
                 rename(
