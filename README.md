@@ -88,7 +88,7 @@ The code in this repository provides a dashboard, written in R:
     - Alternatively, from a Unix shell in this repository's top-level directory, you may run
 
       ```sh
-      (cd dashboard && R -e "shiny::runApp('.', port = 8088)"
+      (cd dashboard && R -e "shiny::runApp('.', port = 8088)")
       ```
 
       You may then visit your web browser at `http://localhost:8088`.
