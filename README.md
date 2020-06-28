@@ -74,7 +74,13 @@ The code in this repository provides a dashboard, written in R:
 | Run command                                 | `⌘ + Shift + P`   | `>`                    |
 | Search for and open a file in the directory | `⌘ + P`           | `(no prefix)`          |
 
-#### Open the Dashboard in RStudio
+#### Use the R Dashboard
+
+##### Option 1: Use the version hosted on `shinyapps.io`
+
+In your web browser, go to https://publicus.shinyapps.io/project_management_dashboard/
+
+#### Option 2: Run the dashboard on your own computer, using RStudio
 
 1.  Open [`dashboard/dashboard.Rproj`](dashboard/dashboard.Rproj) using RStudio:
     1. Open RStudio
