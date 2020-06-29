@@ -1,4 +1,6 @@
-# Dissertation Project Management Intro
+# Single-Worker Project Management Intro
+
+This repository provides a conceptual framework and two concrete approaches (one using [R](https://rstudio.com/) [recommended]; the other using [OpenProject](https://www.openproject.org/)) for managing large projects where you are the sole worker. This repository was created in response to being asked how to conceptualize writing a dissertation: specifically, how to approach a project so large it is impossible to hold completely in mind at once, and how to incentivize oneself to work on the project.
 
 ## General ideas
 
