@@ -10,12 +10,12 @@
 library(shiny)
 library(shinyjs)
 
+source("shared.R")
+
 shinyServer(function(input, output, session) {
     
     hide("selected_files")
     hide("delete_all_files")
-    
-    accepted_extensions <- c("md", "mkd", "markdown", "RMarkdown", "Rmarkdown", "Rmd", "rmd")
     
     status_color_groups <- tribble(
         ~id,          ~content,     ~color,
@@ -191,15 +191,17 @@ shinyServer(function(input, output, session) {
         }
         
         # Return parsed_data:
-        parsed_data
+        parsed_data %>% 
+            filter(
+                group %in% input$selected_statuses &
+                grepl(input$content_search, content, fixed = TRUE)
+            )
     })
     
     output$gantt_chart <- renderTimevis({
         reactive_parsed_data() %>% 
             filter(
-                !is.na(start) &
-                    group %in% input$selected_statuses &
-                    grepl(input$content_search, content, fixed = TRUE)
+                !is.na(start)
             ) %>% 
             timevis(
                 groups = status_color_groups %>% 
@@ -210,11 +212,7 @@ shinyServer(function(input, output, session) {
     })
     
     output$statuses_chart <- renderPlot({
-        ggplot(reactive_parsed_data() %>% 
-            filter(
-               group %in% input$selected_statuses &
-               grepl(input$content_search, content, fixed = TRUE)
-            ), aes(
+        ggplot(reactive_parsed_data(), aes(
             factor(group, levels = c(
                 "DONE",
                 "BLOCKED",
@@ -247,15 +245,10 @@ shinyServer(function(input, output, session) {
             )
     })
     
-    output$scheduled_table <- DT::renderDataTable({
+    create_tasks_table <- function(initial_filter_function) {
         datatable(
             reactive_parsed_data() %>% 
-                filter(
-                    # + 14 adds 14 days
-                    ymd(start) <= (Sys.Date() + 14) & 
-                    group != "DONE" &
-                    grepl(input$content_search, content, fixed = TRUE)
-                ) %>% 
+                initial_filter_function() %>% 
                 select(-style, -start_represents_deadline) %>% 
                 rename(
                     Status = group,
@@ -274,66 +267,45 @@ shinyServer(function(input, output, session) {
                 # Add opacity:
                 paste0(status_color_groups$color, 25)
             )
+        )
+    }
+    
+    output$scheduled_table <- DT::renderDataTable({
+        create_tasks_table(
+            function(input_table) {
+                input_table %>% 
+                    filter(
+                        # + 14 adds 14 days
+                        ymd(start) <= (Sys.Date() + 14) & 
+                            group != "DONE"
+                    )
+            }
         )
     })
     
     output$deadline_table <- DT::renderDataTable({
-        datatable(
-            reactive_parsed_data() %>% 
-                filter(
-                    start_represents_deadline == TRUE &
-                    ymd(start) <= (Sys.Date() + 7) & 
-                    group != "DONE" &
-                    grepl(input$content_search, content, fixed = TRUE)
-                ) %>% 
-                select(-style, -start_represents_deadline) %>% 
-                rename(
-                    Status = group,
-                    Description = content,
-                    Scheduled = start,
-                    Deadline = end
-                ) %>% 
-                filter(
-                    Status %in% input$selected_statuses
-                ),
-            options = list(pageLength = 25)
-        ) %>% formatStyle(
-            "Status",
-            backgroundColor = styleEqual(
-                status_color_groups$content,
-                # Add opacity:
-                paste0(status_color_groups$color, 25)
-            )
+        create_tasks_table(
+            function(input_table) {
+                input_table %>% 
+                    filter(
+                        start_represents_deadline == TRUE &
+                            ymd(start) <= (Sys.Date() + 7) & 
+                            group != "DONE"
+                    )
+            }
         )
     })
     
     output$non_scheduled_non_deadline_table <- DT::renderDataTable({
-        datatable(
-            reactive_parsed_data() %>% 
-                filter(
-                    is.na(start) &
-                    is.na(end) &
-                    group != "DONE" &
-                    grepl(input$content_search, content, fixed = TRUE)
-                ) %>% 
-                select(-style, -start_represents_deadline) %>% 
-                rename(
-                    Status = group,
-                    Description = content,
-                    Scheduled = start,
-                    Deadline = end
-                ) %>% 
-                filter(
-                    Status %in% input$selected_statuses
-                ),
-            options = list(pageLength = 25)
-        ) %>% formatStyle(
-            "Status",
-            backgroundColor = styleEqual(
-                status_color_groups$content,
-                # Add opacity:
-                paste0(status_color_groups$color, 25)
-            )
+        create_tasks_table(
+            function(input_table) {
+                input_table %>% 
+                    filter(
+                        is.na(start) &
+                            is.na(end) &
+                            group != "DONE"
+                    )
+            }
         )
     })
 })

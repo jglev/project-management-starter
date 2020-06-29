@@ -17,6 +17,8 @@ library(shinyjs)
 library(shinythemes)
 library(timevis)
 
+source("shared.R")
+
 statuses_to_choose <- c(
     "TODO",
     "RIGHT NOW",
@@ -30,9 +32,6 @@ statuses_to_choose <- c(
 dashboardPage(
     useShinyjs(),
     skin = "black",
-    # tags$head(
-    #   tags$link(rel = "stylesheet", type = "text/css", href = "style.css")
-    # ),
     
     header = dashboardHeader(
         title = "Project Dashboard"
@@ -72,6 +71,19 @@ dashboardPage(
         )
     ),
     body = dashboardBody(
+        tags$head(
+            # This follows https://community.rstudio.com/t/overflow-scroll-for-shinydashboard-sidebar/2888/2,
+            # for getting the sidebar to scroll on overflow:
+            tags$script(
+                type="text/javascript",
+                '$(document).ready(function(){
+                     $(".main-sidebar").css("height","100%");
+                     $(".main-sidebar .sidebar").css({"position":"relative","max-height": "100%","overflow": "auto"})
+                 })'
+            )
+        ),
+        
+        
         tabItems(
             # First tab content
             tabItem(
@@ -115,14 +127,14 @@ dashboardPage(
                 tabName = "about",
                 fluidRow(
                     box(
-                        HTML("
+                        HTML(paste0("
                             <p>
-                                This app is based on code at <a href='https://github.com/publicus/project-management-starter'>this GitHub repository</a>.
+                                This app's code, and an explanation of the Project Management concepts and approach for the workflow that this app facilitates, are available at <a href='https://github.com/publicus/project-management-starter'>this GitHub repository</a>.
                             </p>
                             <p>
-                                It expects that uploaded files are Markdown, and that they follow <a href='https://github.com/publicus/project-management-starter/blob/master/Project_Notes_Example.md#conventions-in-this-document'>several conventions</a> and use <a href='https://raw.githubusercontent.com/publicus/project-management-starter/master/key.md'>any of a list of pre-defined 'todo' list markers</a>.
+                                It expects that uploaded files have a name that ends in a <a href='https://guides.github.com/features/mastering-markdown/'>Markdown</a> extension (<code>", paste(accepted_extensions, collapse = "</code>, <code>"),"</code>), and that they follow <a href='https://github.com/publicus/project-management-starter/blob/master/Project_Notes_Example.md#conventions-in-this-document'>several conventions</a> and use <a href='https://raw.githubusercontent.com/publicus/project-management-starter/master/key.md'>any of a list of pre-defined 'todo' list markers</a>.
                             </p> 
-                        "),
+                        ")),
                         width = 12
                     ),
                 )
