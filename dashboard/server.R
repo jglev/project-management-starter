@@ -38,7 +38,8 @@ shinyServer(function(input, output, session) {
             perl = TRUE
         ) & (
             input$uploaded_files$type == "text/markdown" |
-                input$uploaded_files$type == "text/plain"
+                input$uploaded_files$type == "text/plain" |
+                input$uploaded_files$type == ""
         )
         
         markdown_files <- input$uploaded_files[markdown_files_indexes,]
